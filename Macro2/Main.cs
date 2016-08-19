@@ -13,13 +13,14 @@ namespace Macro2
 			Console.WriteLine ();
 
 			Console.WriteLine ("For recording macros: ");
-			Console.WriteLine ("macro start [name] - Creates a macro with the script name of \"name\"");
+			Console.WriteLine ("macro start [name] {shell} - Creates a macro with the script name of \"name\" and the shell \"shell\". The shell is optional (uses /bin/bash by default)");
 			Console.WriteLine ();
 
 			Console.WriteLine ("While already recording a macro: ");
 			Console.WriteLine ("macro pause - This command, as well as any other commands before \"macro start\" will not be recorded");
 			Console.WriteLine ("macro start - If paused, this will cease the pausing on the next command");
 			Console.WriteLine ("macro undo - Undo the last command you just did. More powerful with macro pause to fix your environment");
+			Console.WriteLine ("macro contents - Display your script up until this point");
 			Console.WriteLine ();
 
 			Console.WriteLine ("To stop recording a macro: ");
@@ -53,7 +54,7 @@ namespace Macro2
 				return;
 			}
 
-			Middleman middleman = new Middleman ("/bin/bash", DetermineFile(args[0]));
+			Middleman middleman = new Middleman ((args.Length > 1 ? args[1] : "/bin/bash"), DetermineFile(args[0]));
 			middleman.Start ();
 
 			// Middleman exited, Macro should exit too

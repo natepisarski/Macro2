@@ -61,7 +61,7 @@ namespace Macro2
 			Console.WriteLine ("Starting " + ExecutingShell.ShellName );
 
 			for (; ;) {
-				Console.WriteLine ("[Macro]: Line " + CommandScript.Length ());
+				Console.WriteLine ("[Macro]: Line " + (CommandScript.Length ()+1));
 
 				// [Macro [Paused]] {/bin/bash} > _    OR [Macro [Live]] {/bin/bash} > _
 				Console.Write ("[Macro [" + (Paused ? "Paused]]" : "Live]]") + "{" + ExecutingShell.ShellName + "} > ");
@@ -121,7 +121,11 @@ namespace Macro2
 			case "stop": case "quit": case "end":  // Synonyms for "stop" that I've tried in testing...
 				WriteScript (); // The loop actually handles the exiting
 				break;
+			case "contents":
+				WriteContents ();
+				break;
 			default:
+				Console.WriteLine("We didn't understand that macro command. Sorry :(");
 				break;
 			}
 
@@ -148,7 +152,33 @@ namespace Macro2
 		/// </summary>
 		public void WriteScript()
 		{
+			// Puts the name of the shell in the Shebang, and then writes the rest of the lines
 			File.WriteAllLines (Output, (Transformations.Concatenate(Transformations.Wrap("#!" + ExecutingShell.ShellName), CommandScript)));
+		}
+
+		/// <summary>
+		/// Writes the contents of the current CommandScript to standard output
+		/// </summary>
+		public void WriteContents()
+		{
+			Console.WriteLine ();
+
+			// Used for line numbers
+			int counter = 0;
+
+			for (int i = 0; i < CommandScript.Get (0).Length (); i++)
+				Console.Write ("-");
+
+			Console.Write ("[{0}]", ExecutingShell.ShellName);
+
+			Console.WriteLine ();
+
+			foreach (string line in CommandScript) {
+				counter++;
+				Console.WriteLine ("[{0}] {1}", counter, line);	
+			}
+
+
 		}
 	}
 }
