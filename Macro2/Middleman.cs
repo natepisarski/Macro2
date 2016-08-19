@@ -63,7 +63,9 @@ namespace Macro2
 			for (; ;) {
 				Console.WriteLine ("[Macro]: Line " + CommandScript.Length ());
 
-				Console.Write ("[Macro] {" + ExecutingShell.ShellName + "} > ");
+				// [Macro [Paused]] {/bin/bash} > _    OR [Macro [Live]] {/bin/bash} > _
+				Console.Write ("[Macro [" + (Paused ? "Paused]]" : "Live]]") + "{" + ExecutingShell.ShellName + "} > ");
+
 				command = Console.ReadLine ();
 				Console.WriteLine ();
 
@@ -73,6 +75,9 @@ namespace Macro2
 
 				// Dispatch the parsing methods over the command
 				ParseCommand (command);
+
+				// If the command outputs, it's good to have extra room
+				Console.WriteLine ();
 
 				// Does it want us to stop recording? Break out of the loop and tidy up
 				if (command != null && (command.Equals ("macro stop") || command.Equals("macro end") || command.Equals("macro quit") || command.Equals("macro exit")))
@@ -128,7 +133,10 @@ namespace Macro2
 		public void ParseShellComamnd(string command)
 		{
 			try {
-				CommandScript.Add (command);
+
+				if(!Paused)
+					CommandScript.Add (command);
+				
 				ExecutingShell.Run (command);
 			} catch(Exception e) {
 				Console.WriteLine ("[Macro Middleman] Error: " + e);
